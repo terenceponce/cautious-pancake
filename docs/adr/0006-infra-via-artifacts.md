@@ -1,0 +1,32 @@
+# ADR-0006: Infra via artifacts, not a local cluster
+
+Date: 2026-09-14
+Status: Accepted
+
+## Context
+
+Infra competence is worth showing, but the brief says deployment is not required, and a
+take-home must run smoothly for reviewers. LocalStack or a local Kubernetes cluster
+would make the dev environment fragile and the repo hard to evaluate — and running
+your own K8s carries operational cost that a small team shouldn't take on lightly.
+
+## Decision
+
+Show infra competence through runnable/readable artifacts:
+
+- Production-grade Dockerfile (multi-stage, non-root, healthcheck).
+- docker-compose full-stack mode (optional; npm-only path stays the default).
+- GitHub Actions CI: lint, typecheck, unit/integration/stress tests, container build.
+- Production topology documented in the README and system diagram, recommending
+  managed services (e.g., managed Redis, ECS/Fly/Render) over self-run K8s.
+- Ops hygiene in the app: /health + /ready endpoints, graceful SIGTERM shutdown,
+  structured logging.
+
+Explicitly rejected: LocalStack and local K8s as the dev environment.
+
+## Consequences
+
+- Infra signal is strong but cheap to review; default path stays zero-friction.
+- CI doubles as proof the tests actually pass on a clean machine.
+- The "managed services over self-run K8s" recommendation demonstrates sizing
+  infrastructure to the team that has to operate it.
