@@ -6,7 +6,9 @@ Status: Accepted
 ## Context
 
 The sale window, stock, and store selection must be configurable per the brief, and
-compose/dev/CI need to vary them without code changes.
+compose/dev/CI need to vary them without code changes. Sale metadata in a database
+was rejected: the window is immutable per-run config, and sale-management CRUD is
+scope the brief doesn't ask for.
 
 ## Decision
 
