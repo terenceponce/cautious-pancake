@@ -30,3 +30,11 @@ Explicitly rejected: LocalStack and local K8s as the dev environment.
 - CI doubles as proof the tests actually pass on a clean machine.
 - The "managed services over self-run K8s" recommendation demonstrates sizing
   infrastructure to the team that has to operate it.
+
+## Amendments
+
+- 2026-09-15: Setup stays `npm install` + `docker compose up`; any glue that outgrows
+  npm scripts is written in TypeScript (`scripts/*.ts`), not another language.
+  Explicitly rejected: a Go helper with committed compiled binaries — opaque to
+  reviewers, a platform matrix to maintain, and it wraps a setup that is already
+  two commands.
