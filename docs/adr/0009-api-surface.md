@@ -31,6 +31,21 @@ the store: `already_purchased` wins over `sold_out` when both are true.
 `userId` is a free-form identifier with no authentication — per the brief, "enter a
 user identifier" is the whole identity model. One-per-user is enforced per identifier.
 
+Alternatives considered for identity:
+
+- **Self-minted JWT** (login endpoint issuing tokens for any username): a JWT's value
+  comes from a trusted issuer verifying identity first; with no user store or IdP,
+  this is cryptographically decorated but security-identical to a bare `userId`.
+- **JWT with a simulated IdP**: verified `Authorization: Bearer` on purchase/check,
+  dev-only token endpoint framed as the IdP mock. Production API shape at ~half a
+  day's cost; defensible, but spends scope the brief spends elsewhere.
+- **Real auth (e.g. Better Auth)**: proper accounts, but drags in a database, schema,
+  signup/login UI, and a day of work for a requirement nobody asked for — and adds
+  register/login friction to the one flow the brief wants smooth.
+
+In production, `userId` would come from a verified JWT/session claim and the
+`SaleStore` contract would be unchanged.
+
 ## Consequences
 
 - The frontend branches on one enum; the HTTP codes are for correctness tooling,
