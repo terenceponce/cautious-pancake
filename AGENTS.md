@@ -12,6 +12,7 @@ House rules for anyone (or anything) working in this repo.
 
 - Anything we discuss and decide gets an Architecture Decision Record (ADR) in `docs/adr/`.
 - ADRs are drafts until merged to `main` — edit freely before that. Once on `main`, never rewrite: append a dated amendment explaining what changed and why, so the file reads as the history of the decision.
+- Amendments carry the date and a link to the PR they landed in, e.g. `- 2026-09-15 [#4](https://github.com/terenceponce/cautious-pancake/pull/4): ...`.
 - Always link to the ADR file when mentioning one, e.g. `[ADR-0005](docs/adr/0005-in-memory-plus-redis.md)`, so IDE go-to-file works.
 
 ## Work happens in git worktrees
