@@ -29,3 +29,10 @@ system diagram.
 - Two implementations to maintain (~50 extra lines); acceptable for the signal.
 - In-memory mode loses purchase records on crash — accepted for dev; Redis mode is
   the production-credible one.
+
+## Amendments
+
+- 2026-09-15: Two implementations risk drifting apart. Mitigation: a contract test
+  suite — the same behavioral assertions run against every `SaleStore` implementation
+  in CI. Divergence between implementations becomes a failing build, not a production
+  bug. The behavior spec lives in the shared suite, not in either impl.
