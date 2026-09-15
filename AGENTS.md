@@ -24,3 +24,4 @@ House rules for anyone (or anything) working in this repo.
 
 - Commit messages follow Conventional Commits: `type(scope): description` — types like `feat`, `fix`, `docs`, `test`, `refactor`, `chore`.
 - Subject is lowercase, imperative, no trailing period.
+- Merges are squash-only, so the PR title becomes the commit on `main` — PR titles follow Conventional Commits too.
