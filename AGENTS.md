@@ -11,7 +11,7 @@ House rules for anyone (or anything) working in this repo.
 ## Decisions get an ADR
 
 - Anything we discuss and decide gets an Architecture Decision Record (ADR) in `docs/adr/`.
-- ADRs are amended, never silently rewritten. To change a decision, append a dated amendment explaining what changed and why, so the file reads as the history of how the decision came about.
+- ADRs are drafts until merged to `main` — edit freely before that. Once on `main`, never rewrite: append a dated amendment explaining what changed and why, so the file reads as the history of the decision.
 - Always link to the ADR file when mentioning one, e.g. `[ADR-0005](docs/adr/0005-in-memory-plus-redis.md)`, so IDE go-to-file works.
 
 ## Work happens in git worktrees

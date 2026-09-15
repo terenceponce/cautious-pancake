@@ -5,17 +5,16 @@ Status: Accepted
 
 ## Context
 
-The project brief asks us to justify our design choices. We want the reasoning behind
-each decision to be visible without digging through git history or chat logs.
+The brief asks us to justify our design choices, and we want the reasoning visible
+without digging through git history or chat logs.
 
 ## Decision
 
 Keep every meaningful decision as an ADR in `docs/adr/`, numbered in order
-(`0001-short-title.md`). ADRs are never rewritten after the fact. When a decision
-changes, append a dated amendment to the ADR explaining what changed and why.
+(`0001-short-title.md`). ADRs are editable until merged to `main`; after that,
+changed only by dated amendment.
 
 ## Consequences
 
 - Slight overhead per decision, but the "why" is always on record.
-- Each ADR doubles as a template for the next one.
-- The interview brief's "justify your design choices" requirement is satisfied by default.
+- The brief's "justify your design choices" requirement is satisfied by default.

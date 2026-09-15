@@ -18,5 +18,5 @@ serialization built into routes, first-class TypeScript support, minimal boilerp
 
 - Hot path stays cheap without hand-rolled validation.
 - Smaller ecosystem than Express; everything we need is built in.
-- Honest caveat for the write-up: the router is not the real throughput bottleneck
-  for this system — the state layer is (see [ADR-0005](0005-in-memory-plus-redis.md)).
+- The router is not this system's real throughput bottleneck — the state layer is
+  (see [ADR-0005](0005-in-memory-plus-redis.md)).
