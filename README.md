@@ -17,3 +17,4 @@ The short version of every trade-off; the ADRs carry the full reasoning.
 - **Infra via artifacts** — Dockerfile, compose mode, CI, and production topology docs; no local cluster ([ADR-0006](docs/adr/0006-infra-via-artifacts.md))
 - **Vitest for correctness, k6 for load** — one TS-native runner for behavior, an industry-standard generator for throughput numbers ([ADR-0007](docs/adr/0007-vitest-and-k6.md))
 - **React + Vite + Chakra** — the frontend is 20% of the role; the time budget follows ([ADR-0008](docs/adr/0008-react-vite-chakra.md))
+- **One origin for frontend and API** — Vite proxy in dev, nginx edge in compose; no CORS anywhere ([ADR-0012](docs/adr/0012-frontend-serving.md))
