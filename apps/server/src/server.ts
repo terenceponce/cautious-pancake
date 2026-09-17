@@ -1,10 +1,13 @@
 import { loadConfig } from './config.js'
 import { buildApp } from './app.js'
+import { createStore } from './stores/index.js'
 
 const config = loadConfig()
-const app = buildApp(config)
+const store = createStore(config)
+await store.init(config.STOCK)
 
-app.listen({ port: config.PORT, host: '0.0.0.0' })
+const app = await buildApp({ config, store })
+await app.listen({ port: config.PORT, host: '0.0.0.0' })
 
 for (const signal of ['SIGTERM', 'SIGINT'] as const) {
   process.on(signal, () => {
