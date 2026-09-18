@@ -8,6 +8,7 @@
     "perf"
   ],
   "scripts": {
+    "dev": "concurrently -n server,web -c blue,green npm:dev:server npm:dev:web",
     "dev:server": "npm run dev -w apps/server",
     "dev:web": "npm run dev -w apps/web",
     "build": "npm run build --workspaces --if-present",
@@ -21,6 +22,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "concurrently": "^10.0.5",
     "eslint": "^10.10.0",
     "typescript-eslint": "^8.70.0"
   }
