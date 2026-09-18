@@ -38,3 +38,28 @@ jobs:
       - uses: actions/checkout@v4
       - run: docker build -f apps/server/Dockerfile .
       - run: docker build -f apps/web/Dockerfile .
+
+  k6-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build -w apps/server
+      - name: Start server
+        run: |
+          SALE_START=$(date -u -d '-1 minute' +%Y-%m-%dT%H:%M:%S.000Z) \
+          SALE_END=$(date -u -d '+10 minutes' +%Y-%m-%dT%H:%M:%S.000Z) \
+          STOCK=50 nohup node apps/server/dist/server.js > /dev/null 2>&1 &
+          for i in $(seq 1 30); do curl -sf localhost:3000/health && break; sleep 1; done
+      - name: Burst smoke (correctness assertions)
+        run: |
+          docker run --rm --network host -i grafana/k6 run \
+            -e STOCK=50 -e BUYERS=200 -e VUS=50 - < perf/purchase-burst.js
+      - name: Post-sellout smoke
+        run: |
+          docker run --rm --network host -i grafana/k6 run \
+            -e VUS=20 -e DURATION=5s - < perf/post-sellout.js

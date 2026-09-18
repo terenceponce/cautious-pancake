@@ -38,3 +38,23 @@ Production-shaped: nginx serves the frontend and proxies `/api`, the server runs
 cp .env.example .env                            # set the sale window + stock
 docker compose up --build                       # http://localhost:8080
 ```
+
+## Stress tests
+
+Correctness under concurrency is asserted by the Vitest contract/concurrency suites in CI. The k6 suites below prove throughput and latency; install [k6](https://grafana.com/docs/k6/latest/set-up/install-k6/) (or use the Docker image as shown), build the server, and run against it:
+
+```
+npm run build -w apps/server
+SALE_START=<past> SALE_END=<future> STOCK=100 node apps/server/dist/server.js &
+docker run --rm --network host -i grafana/k6 run -e STOCK=100 -e BUYERS=5000 -e VUS=500 - < perf/purchase-burst.js
+docker run --rm --network host -i grafana/k6 run -e VUS=200 -e DURATION=20s - < perf/post-sellout.js
+```
+
+Measured locally (single in-memory process, k6 in Docker; absolute numbers are machine-dependent — the exact-count assertions are the point):
+
+| Suite | Load | Result |
+|---|---|---|
+| `purchase-burst` | 5,000 buyers, 500 concurrent, stock 100 | exactly 100 sold / 4,900 `sold_out`, 0 failures, ~9.6k req/s, med 19ms, p90 38ms (p95 tail is first-wave queueing) |
+| `post-sellout` | 200 VUs for 20s after sellout | 340k requests, 100% instant 410s, p95 13ms, ~17k req/s |
+
+Both suites also run as small smoke profiles in CI, so the exact-count assertions (no oversell, no failed requests) are enforced on every push.
