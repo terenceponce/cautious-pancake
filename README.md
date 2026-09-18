@@ -49,6 +49,8 @@ cp apps/server/.env.example apps/server/.env   # set a sale window around now
 npm run dev                                    # server on :3000, web on :5173
 ```
 
+`npm run dev` runs both with labeled output; `npm run dev:server` and `npm run dev:web` run either side alone.
+
 ### Full stack via Docker (optional)
 
 Production-shaped: nginx serves the frontend and proxies `/api`, the server runs against Redis.
