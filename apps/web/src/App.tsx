@@ -3,14 +3,21 @@ import {
   Alert,
   AlertIcon,
   Badge,
+  Box,
   Button,
+  Card,
+  CardBody,
+  CardFooter,
   Container,
+  Flex,
   Heading,
-  Input,
+  HStack,
+  Progress,
   Text,
-  VStack,
 } from '@chakra-ui/react'
 import type { PurchaseResponse, SaleStatusResponse } from '@flashsale/api-types'
+import { useSession } from './session'
+import { LoginModal } from './LoginModal'
 
 const OUTCOME_MESSAGE: Record<string, string> = {
   success: 'You secured one!',
@@ -19,12 +26,33 @@ const OUTCOME_MESSAGE: Record<string, string> = {
   sale_not_active: 'The sale is not running right now.',
 }
 
+function Countdown({ target, label }: { target: string; label: string }) {
+  const [now, setNow] = useState(Date.now())
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(timer)
+  }, [])
+
+  const secondsLeft = Math.max(0, Math.floor((new Date(target).getTime() - now) / 1000))
+  if (secondsLeft === 0) return null
+  const h = Math.floor(secondsLeft / 3600)
+  const m = Math.floor((secondsLeft % 3600) / 60)
+  const s = secondsLeft % 60
+  const text = h > 0 ? `${h}h ${String(m).padStart(2, '0')}m` : `${m}:${String(s).padStart(2, '0')}`
+  return (
+    <Text fontSize="sm" color="gray.500">
+      {label} in {text}
+    </Text>
+  )
+}
+
 export function App() {
   const [sale, setSale] = useState<SaleStatusResponse | null>(null)
-  const [userId, setUserId] = useState('')
   const [busy, setBusy] = useState(false)
   const [outcome, setOutcome] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [loginOpen, setLoginOpen] = useState(false)
+  const { user, signIn, signOut } = useSession()
 
   useEffect(() => {
     const refresh = () =>
@@ -37,14 +65,14 @@ export function App() {
     return () => clearInterval(timer)
   }, [])
 
-  async function buy() {
+  async function attemptPurchase(email: string): Promise<void> {
     setBusy(true)
     setError(null)
     try {
       const res = await fetch('/api/purchase', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ userId: userId.trim() }),
+        body: JSON.stringify({ userId: email }),
       })
       setOutcome(((await res.json()) as PurchaseResponse).outcome)
     } catch {
@@ -54,52 +82,119 @@ export function App() {
     }
   }
 
+  function buy(): void {
+    if (!user) {
+      setLoginOpen(true)
+      return
+    }
+    void attemptPurchase(user)
+  }
+
   const active = sale?.status === 'active'
   const soldOut = active && sale.stockRemaining === 0
   const bought = outcome === 'success' || outcome === 'already_purchased'
 
   return (
-    <Container maxW="md" py={10}>
-      <VStack spacing={6} align="stretch">
-        <Heading size="lg">Flash Sale</Heading>
+    <Box minH="100vh" bg="gray.50">
+      <Box bg="white" borderBottomWidth="1px" px={6} py={3}>
+        <Container maxW="4xl">
+          <Flex justify="space-between" align="center">
+            <Heading size="md">⚡ FlashSale</Heading>
+            {user ? (
+              <HStack spacing={3}>
+                <Text fontSize="sm" color="gray.600">
+                  {user}
+                </Text>
+                <Button size="sm" variant="outline" onClick={signOut}>
+                  Sign out
+                </Button>
+              </HStack>
+            ) : (
+              <Button size="sm" variant="outline" onClick={() => setLoginOpen(true)}>
+                Sign in
+              </Button>
+            )}
+          </Flex>
+        </Container>
+      </Box>
 
-        {sale && (
-          <Text fontSize="xl">
-            <Badge colorScheme={active ? 'green' : 'gray'}>{sale.status}</Badge>{' '}
-            {active && `${sale.stockRemaining} left`}
-          </Text>
-        )}
+      <Container maxW="4xl" py={10}>
+        <Card overflow="hidden">
+          <Box h="220px" bgGradient="linear(to-br, purple.500, pink.500)" display="flex" alignItems="center" justifyContent="center">
+            <Text fontSize="96px">🎧</Text>
+          </Box>
+          <CardBody>
+            <Flex justify="space-between" align="flex-start" mb={4}>
+              <Box>
+                <Heading size="lg" mb={1}>
+                  Nova One — Limited Edition
+                </Heading>
+                <Text fontSize="2xl" fontWeight="bold">
+                  $149
+                </Text>
+              </Box>
+              <Box textAlign="right">
+                <Badge colorScheme={active ? 'green' : 'gray'} fontSize="md" px={2} py={1}>
+                  {sale?.status ?? '…'}
+                </Badge>
+                <Box mt={2}>
+                  {sale?.status === 'upcoming' && <Countdown target={sale.startsAt} label="Starts" />}
+                  {sale?.status === 'active' && <Countdown target={sale.endsAt} label="Ends" />}
+                </Box>
+              </Box>
+            </Flex>
 
-        <Input
-          placeholder="your@email.com"
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-          isDisabled={bought}
-        />
+            {sale && active && (
+              <Box mb={4}>
+                <Progress
+                  value={(sale.stockRemaining / sale.stockTotal) * 100}
+                  size="sm"
+                  colorScheme={sale.stockRemaining / sale.stockTotal < 0.2 ? 'red' : 'green'}
+                  mb={1}
+                />
+                <Text fontSize="sm" color="gray.500">
+                  {sale.stockRemaining} of {sale.stockTotal} left
+                </Text>
+              </Box>
+            )}
 
-        <Button
-          colorScheme="green"
-          size="lg"
-          isDisabled={!userId.trim() || busy || bought || !active || soldOut}
-          isLoading={busy}
-          onClick={() => void buy()}
-        >
-          {soldOut ? 'Sold out' : !active ? sale && sale.status === 'upcoming' ? 'Starts soon' : 'Sale ended' : 'Buy Now'}
-        </Button>
+            {outcome && (
+              <Alert status={outcome === 'success' ? 'success' : 'info'} mb={error ? 3 : 0}>
+                <AlertIcon />
+                {OUTCOME_MESSAGE[outcome]}
+              </Alert>
+            )}
+            {error && (
+              <Alert status="error">
+                <AlertIcon />
+                {error}
+              </Alert>
+            )}
+          </CardBody>
+          <CardFooter pt={0}>
+            <Button
+              colorScheme="green"
+              size="lg"
+              width="100%"
+              isDisabled={busy || bought || !active || soldOut}
+              isLoading={busy}
+              onClick={buy}
+            >
+              {bought ? 'Secured ✓' : soldOut ? 'Sold out' : !active ? 'Sale not running' : 'Buy Now'}
+            </Button>
+          </CardFooter>
+        </Card>
+      </Container>
 
-        {outcome && (
-          <Alert status={outcome === 'success' ? 'success' : 'info'}>
-            <AlertIcon />
-            {OUTCOME_MESSAGE[outcome]}
-          </Alert>
-        )}
-        {error && (
-          <Alert status="error">
-            <AlertIcon />
-            {error}
-          </Alert>
-        )}
-      </VStack>
-    </Container>
+      <LoginModal
+        isOpen={loginOpen}
+        onClose={() => setLoginOpen(false)}
+        onSubmit={(email) => {
+          setLoginOpen(false)
+          signIn(email)
+          void attemptPurchase(email)
+        }}
+      />
+    </Box>
   )
 }

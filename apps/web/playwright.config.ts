@@ -8,7 +8,7 @@ const serverEnv = {
   STORE: 'memory',
   SALE_START: new Date(now - 60 * 60_000).toISOString(),
   SALE_END: new Date(now + 60 * 60_000).toISOString(),
-  STOCK: '3',
+  STOCK: '4',
   PORT: '3000',
 }
 
