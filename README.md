@@ -46,8 +46,7 @@ The short version of every trade-off; the ADRs carry the full reasoning.
 ```
 npm install
 cp apps/server/.env.example apps/server/.env   # set a sale window around now
-npm run dev:server                             # http://localhost:3000
-npm run dev:web                                # http://localhost:5173
+npm run dev                                    # server on :3000, web on :5173
 ```
 
 ### Full stack via Docker (optional)
