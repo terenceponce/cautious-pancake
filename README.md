@@ -18,3 +18,23 @@ The short version of every trade-off; the ADRs carry the full reasoning.
 - **Vitest for correctness, k6 for load** — one TS-native runner for behavior, an industry-standard generator for throughput numbers ([ADR-0007](docs/adr/0007-vitest-and-k6.md))
 - **React + Vite + Chakra** — the frontend is 20% of the role; the time budget follows ([ADR-0008](docs/adr/0008-react-vite-chakra.md))
 - **One origin for frontend and API** — Vite proxy in dev, nginx edge in compose; no CORS anywhere ([ADR-0012](docs/adr/0012-frontend-serving.md))
+
+## Running
+
+### Dev (npm only)
+
+```
+npm install
+cp apps/server/.env.example apps/server/.env   # set a sale window around now
+npm run dev:server                             # http://localhost:3000
+npm run dev:web                                # http://localhost:5173
+```
+
+### Full stack via Docker (optional)
+
+Production-shaped: nginx serves the frontend and proxies `/api`, the server runs against Redis.
+
+```
+cp .env.example .env                            # set the sale window + stock
+docker compose up --build                       # http://localhost:8080
+```
