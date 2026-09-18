@@ -1,8 +1,28 @@
 # Flash Sale System
 
-A high-throughput flash sale platform (take-home project). Work in progress.
+A high-throughput flash sale platform: one product, limited stock, one item per user, no overselling under load. Take-home project.
 
 - [Project instructions](./INSTRUCTIONS.md)
+
+## Architecture
+
+```mermaid
+flowchart LR
+  B["Browser"] --> NG["nginx edge<br/>static + /api proxy"]
+  NG --> S1["Fastify instance"]
+  NG --> S2["Fastify instance"]
+  S1 --> R[("Redis<br/>atomic Lua check-and-decrement")]
+  S2 --> R
+```
+
+All correctness lives in one place: a Lua script inside Redis that checks the
+buyer set and stock and mutates both atomically — safe across any number of
+stateless app instances. The sale window is enforced with a clock read before
+any store round trip, so out-of-window traffic costs almost nothing. Dev runs
+the same logic on an in-memory store (event-loop atomic, zero setup); both
+implementations pass an identical contract suite in CI.
+
+Full diagrams and the scaling path: [docs/system-diagram.md](docs/system-diagram.md).
 
 ## Design choices
 
