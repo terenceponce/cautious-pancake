@@ -28,4 +28,5 @@ services:
     ports:
       - "${WEB_PORT:-8686}:80"
     depends_on:
-      - server
+      server:
+        condition: service_healthy
