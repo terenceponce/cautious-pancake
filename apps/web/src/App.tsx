@@ -90,6 +90,13 @@ export function App() {
     void attemptPurchase(user)
   }
 
+  // The purchase outcome belongs to the session user; a fresh session starts clean.
+  function handleSignOut(): void {
+    signOut()
+    setOutcome(null)
+    setError(null)
+  }
+
   const active = sale?.status === 'active'
   const soldOut = active && sale.stockRemaining === 0
   const bought = outcome === 'success' || outcome === 'already_purchased'
@@ -105,7 +112,7 @@ export function App() {
                 <Text fontSize="sm" color="gray.600">
                   {user}
                 </Text>
-                <Button size="sm" variant="outline" onClick={signOut}>
+                <Button size="sm" variant="outline" onClick={handleSignOut}>
                   Sign out
                 </Button>
               </HStack>

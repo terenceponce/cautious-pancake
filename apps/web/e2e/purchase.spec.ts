@@ -47,6 +47,8 @@ test('sign out returns to the signed-out state', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Sign out' }).click()
   await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible()
+  await expect(page.getByText('You secured one!')).toBeHidden()
+  await expect(page.getByRole('button', { name: 'Buy Now' })).toBeVisible()
 })
 
 test('sold out: button reflects an empty sale', async ({ page }) => {
