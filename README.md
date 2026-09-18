@@ -56,7 +56,7 @@ Production-shaped: nginx serves the frontend and proxies `/api`, the server runs
 
 ```
 cp .env.example .env                            # set the sale window + stock
-docker compose up --build                       # http://localhost:8080
+docker compose up --build                       # http://localhost:8686
 ```
 
 ## Stress tests

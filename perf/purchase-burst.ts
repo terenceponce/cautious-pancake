@@ -5,7 +5,7 @@
 //   k6 run -e STOCK=100 -e BUYERS=5000 -e VUS=500 purchase-burst.ts
 //
 // BASE_URL defaults to the bare server; point it at the compose nginx edge
-// (http://localhost:8080) to load-test the full path.
+// (http://localhost:8686) to load-test the full path.
 
 import http from 'k6/http'
 import { check } from 'k6'
