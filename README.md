@@ -79,3 +79,33 @@ Measured locally (single in-memory process, k6 in Docker; absolute numbers are m
 | `post-sellout` | 200 VUs for 20s after sellout | 340k requests, 100% instant 410s, p95 13ms, ~17k req/s |
 
 Both suites also run as small smoke profiles in CI, so the exact-count assertions (no oversell, no failed requests) are enforced on every push.
+
+## Requirements coverage
+
+Where each requirement from the brief is answered, and the evidence that it holds.
+
+**Functional**
+
+| Requirement | Answer | Evidence |
+|---|---|---|
+| Configurable sale window, enforced | Env config ([ADR-0010](docs/adr/0010-configuration.md)); clock check before any store call | Route tests: 403 `sale_not_active` before/after window |
+| Single product, limited stock | Atomic check-and-decrement in the store ([ADR-0005](docs/adr/0005-in-memory-plus-redis.md)) | Contract tests: stock reaches exactly 0 |
+| One item per user | Buyer set checked inside the same atomic unit | Contract tests; same-user race wins exactly once |
+| Status / purchase / check endpoints | [ADR-0009](docs/adr/0009-api-surface.md) semantics | API integration tests |
+| Frontend (status, identifier, buy, feedback) | Storefront with sign-in gate ([ADR-0008](docs/adr/0008-react-vite-chakra.md)) | Playwright E2E |
+| System diagram | [docs/system-diagram.md](docs/system-diagram.md) | — |
+
+**Non-functional**
+
+| Requirement | Answer | Evidence |
+|---|---|---|
+| High throughput & scalability | Stateless tier over Redis; two-op hot path ([ADR-0011](docs/adr/0011-overload-behavior.md)); scaling path in the diagram | k6: ~9.6k req/s burst, ~17k req/s post-sellout at p95 13ms |
+| Robustness & fault tolerance | Sale state in Redis (survives app crashes, `SET NX` seeding); graceful shutdown; health probes; edge degrades to 502, never dies | Server restart mid-sale kept stock; edge recovered from upstream restart with a new IP |
+| Concurrency control (no oversell) | One atomic unit per purchase — event loop in-memory, Lua in Redis; identical contract suite for both stores | k6 exact-count thresholds: 5,000 buyers → exactly STOCK sold, or the build fails |
+
+**Testing**
+
+| Requirement | Answer | Evidence |
+|---|---|---|
+| Unit & integration tests | Vitest: contract, concurrency, route integration | 24 tests, every push in CI |
+| Stress tests with explainable results | k6 burst + post-sellout suites | Numbers and interpretation in the section above |
