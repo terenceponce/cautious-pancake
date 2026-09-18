@@ -58,8 +58,8 @@ jobs:
       - name: Burst smoke (correctness assertions)
         run: |
           docker run --rm --network host -i grafana/k6 run \
-            -e STOCK=50 -e BUYERS=200 -e VUS=50 - < perf/purchase-burst.js
+            -e STOCK=50 -e BUYERS=200 -e VUS=50 - < perf/purchase-burst.ts
       - name: Post-sellout smoke
         run: |
           docker run --rm --network host -i grafana/k6 run \
-            -e VUS=20 -e DURATION=5s - < perf/post-sellout.js
+            -e VUS=20 -e DURATION=5s - < perf/post-sellout.ts

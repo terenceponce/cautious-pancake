@@ -46,8 +46,8 @@ Correctness under concurrency is asserted by the Vitest contract/concurrency sui
 ```
 npm run build -w apps/server
 SALE_START=<past> SALE_END=<future> STOCK=100 node apps/server/dist/server.js &
-docker run --rm --network host -i grafana/k6 run -e STOCK=100 -e BUYERS=5000 -e VUS=500 - < perf/purchase-burst.js
-docker run --rm --network host -i grafana/k6 run -e VUS=200 -e DURATION=20s - < perf/post-sellout.js
+docker run --rm --network host -i grafana/k6 run -e STOCK=100 -e BUYERS=5000 -e VUS=500 - < perf/purchase-burst.ts
+docker run --rm --network host -i grafana/k6 run -e VUS=200 -e DURATION=20s - < perf/post-sellout.ts
 ```
 
 Measured locally (single in-memory process, k6 in Docker; absolute numbers are machine-dependent — the exact-count assertions are the point):

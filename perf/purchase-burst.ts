@@ -2,7 +2,7 @@
 // Passes only if exactly STOCK purchases succeed — an oversell or undersell
 // fails the run via the exact-count thresholds.
 //
-//   k6 run -e STOCK=100 -e BUYERS=5000 -e VUS=500 purchase-burst.js
+//   k6 run -e STOCK=100 -e BUYERS=5000 -e VUS=500 purchase-burst.ts
 //
 // BASE_URL defaults to the bare server; point it at the compose nginx edge
 // (http://localhost:8080) to load-test the full path.
@@ -12,10 +12,10 @@ import { check } from 'k6'
 import { Counter } from 'k6/metrics'
 import exec from 'k6/execution'
 
-const BASE_URL = __ENV.BASE_URL || 'http://localhost:3000'
-const STOCK = Number(__ENV.STOCK || 100)
-const BUYERS = Number(__ENV.BUYERS || 5000)
-const VUS = Number(__ENV.VUS || 500)
+const BASE_URL: string = __ENV.BASE_URL || 'http://localhost:3000'
+const STOCK: number = Number(__ENV.STOCK || 100)
+const BUYERS: number = Number(__ENV.BUYERS || 5000)
+const VUS: number = Number(__ENV.VUS || 500)
 
 const successes = new Counter('purchase_success')
 const soldOut = new Counter('purchase_sold_out')
@@ -36,14 +36,14 @@ export const options = {
     http_req_failed: ['rate==0'],
     // The simultaneous first wave queues on a single process, so p95 includes
     // queueing, not just service time — steady-state latency is proven by
-    // post-sellout.js. Med/p90 carry the hot-path story here.
+    // post-sellout.ts. Med/p90 carry the hot-path story here.
     http_req_duration: ['p(95)<500'],
     purchase_success: [`count==${STOCK}`],
     purchase_sold_out: [`count==${BUYERS - STOCK}`],
   },
 }
 
-export default function () {
+export default function (): void {
   // Globally unique across VUs and iterations: one attempt per buyer.
   const userId = `buyer-${exec.scenario.iterationInTest}`
   const res = http.post(`${BASE_URL}/api/purchase`, JSON.stringify({ userId }), {
