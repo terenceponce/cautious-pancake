@@ -53,3 +53,7 @@ In production, `userId` would come from a verified JWT/session claim and the
 - `stockRemaining` in status keeps scarcity visible without extra endpoints.
 - No auth means a user could enter different identifiers; that limitation is
   inherent to the brief and stays out of scope.
+
+## Amendments
+
+- 2026-09-18 [#11](https://github.com/terenceponce/cautious-pancake/pull/11): `GET /api/sale/status` additionally returns `stockTotal` — additive, needed by the frontend's scarcity bar. No behavior or auth changes.

@@ -30,6 +30,7 @@ export const saleRoutes: FastifyPluginAsync<SalePluginOptions> = async (
     startsAt: options.config.SALE_START.toISOString(),
     endsAt: options.config.SALE_END.toISOString(),
     stockRemaining: await options.store.remainingStock(),
+    stockTotal: options.config.STOCK,
   }))
 
   app.post<{ Body: { userId: string } }>(

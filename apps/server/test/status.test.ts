@@ -27,6 +27,7 @@ describe('GET /api/sale/status', () => {
     expect(res.statusCode).toBe(200)
     expect(res.json<SaleStatusResponse>().status).toBe('active')
     expect(res.json<SaleStatusResponse>().stockRemaining).toBe(100)
+    expect(res.json<SaleStatusResponse>().stockTotal).toBe(100)
     expect(new Date(res.json<SaleStatusResponse>().startsAt).getTime()).toBeGreaterThan(now - 61_000)
   })
 

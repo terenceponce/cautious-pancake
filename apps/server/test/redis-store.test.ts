@@ -1,4 +1,4 @@
-import { afterAll } from 'vitest'
+import { afterAll, describe } from 'vitest'
 import { randomUUID } from 'node:crypto'
 import { saleStoreContract, saleStoreConcurrency } from './contract.js'
 import { RedisSaleStore } from '../src/stores/redis.js'
@@ -15,13 +15,15 @@ async function make(stock: number) {
   return store
 }
 
-if (REDIS_URL) {
+// describe.skip when REDIS_URL is unset: the suite shows as skipped rather
+// than failing the file with "no test suite found".
+const redisSuite = REDIS_URL ? describe : describe.skip
+
+redisSuite('redis store', () => {
   saleStoreContract('redis', make)
   saleStoreConcurrency('redis', make)
 
   afterAll(async () => {
     await Promise.all(stores.map((s) => s.close()))
   })
-} else {
-  console.warn('REDIS_URL not set — skipping Redis contract tests')
-}
+})

@@ -5,6 +5,7 @@ export interface SaleStatusResponse {
   startsAt: string
   endsAt: string
   stockRemaining: number
+  stockTotal: number
 }
 
 export type PurchaseOutcome =
